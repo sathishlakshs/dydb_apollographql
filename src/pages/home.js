@@ -4,10 +4,10 @@ import TableViewWithAction from "../common/tableView";
 import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import * as _ from "lodash";
-import {  Link  } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
-
-const GET_EMPLOYEES = gql`
+export const GET_EMPLOYEES = gql`
   query {
     listEmployees {
       items {
@@ -30,19 +30,35 @@ const tableBody = emps => {
 };
 
 const navEmpForm = () => {
-    return <Link to="/form" className="linkBtn">Add New</Link>
-}
+  return (
+    <Link to="/form/0" className="linkBtn">
+      Add New
+    </Link>
+  );
+};
+
+const deleteEmp = empId => {
+  console.log(empId);
+};
 
 function Home() {
+  const history = useHistory();
   const { data, loading, error } = useQuery(GET_EMPLOYEES);
+  const editEmp = empId => {
+    console.log(empId);
+    history.push(`/form/${empId}`);
+  };
   return (
     <>
-      <Header addNew = {navEmpForm()}/>
+      <Header addNew={navEmpForm()} />
       <div className="pl30 pr30 pt30">
         {!loading ? (
           <TableViewWithAction
             bodyData={tableBody(data.listEmployees.items)}
             heading={tableHeader()}
+            edit={editEmp}
+            isAction={true}
+            del={deleteEmp}
           />
         ) : (
           "Data not found"
