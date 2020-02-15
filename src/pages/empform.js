@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
 import { useMutation, useQuery } from "@apollo/react-hooks";
@@ -37,43 +37,79 @@ export const GET_EMPLOYEE = gql`
   }
 `;
 
+export const UPDATE_EMPLOYEE = gql`
+  mutation updateEmployee($id: ID!, $firstName: String!, $lastName: String!) {
+    updateEmployee(
+      input: { id: $id, firstName: $firstName, lastName: $lastName }
+    ) {
+      firstName
+      lastName
+    }
+  }
+`;
+
 const handleChange = (name, value, setForm, form) => {
   setForm({ ...form, [name]: value });
 };
 
-const save = (form, createMutate, history) => {
+const save = (
+  form,
+  createEmployeeMutate,
+  history,
+  empId,
+  updateEmployeeMutate
+) => {
   if (form.firstName && form.lastName) {
-    createMutate({
-      variables: { firstName: form.firstName, lastName: form.lastName },
-      refetchQueries: [
-        {
-          query: GET_EMPLOYEES
-        }
-      ]
-    });
+    if (empId && empId !== "0") {
+      updateEmployeeMutate({
+        variables: {id: empId, firstName: form.firstName, lastName: form.lastName },
+        refetchQueries: [
+          {
+            query: GET_EMPLOYEES
+          }
+        ]
+      });
+    } else {
+      createEmployeeMutate({
+        variables: { firstName: form.firstName, lastName: form.lastName },
+        refetchQueries: [
+          {
+            query: GET_EMPLOYEES
+          }
+        ]
+      });
+    }
     history.push("/home");
-  } else {
   }
 };
 
+const btnTxtChange = (empId) => {
+  if(empId !== "0" && empId) {
+    return "Update";
+  } 
+  return "Save";
+}
+
 function Empform(props) {
   const history = useHistory();
-  let initState = { firstName: "", lastName: "", address: [], skills: [] };
-  let actualValue = new Object(null);
-  let btnText = "Save";
-  const { data } = useQuery(GET_EMPLOYEE, {
-    variables: { id: props.match.params.empId }
-  });
-  const [createMutate, { loading, error }] = useMutation(CREATE_EMPLOYEE);
-  const [form, setForm] = useState(initState);
-  if (data) {
-    if (data.getEmployee) {
-      btnText = "Update";
-      actualValue = { ...data.getEmployee };
+  const btnText = btnTxtChange(props.match.params.empId);
+  const [form, setForm] = useState({ firstName: "", lastName: "", address: [], skills: [] });
+  const { data } = useQuery(
+    GET_EMPLOYEE,
+    {
+      variables: { id: props.match.params.empId }
     }
-  }
+  );
+  const [createEmployeeMutate, { loading, error }] = useMutation(CREATE_EMPLOYEE);
+  const [updateEmployeeMutate] = useMutation(UPDATE_EMPLOYEE);
   const classes = useStyles();
-  console.log(form);
+  useEffect(() => {
+    if (data) {
+      if (data.getEmployee) {
+        setForm(data.getEmployee);
+      }
+    }
+  }, [data]);
   return (
     <>
       <form className={classes.root} noValidate autoComplete="off">
@@ -85,7 +121,7 @@ function Empform(props) {
             onChange={e =>
               handleChange("firstName", e.target.value, setForm, form)
             }
-            value={data ? actualValue.firstName : ""}
+            value={form.firstName}
           />
           <TextField
             required
@@ -94,14 +130,22 @@ function Empform(props) {
             onChange={e =>
               handleChange("lastName", e.target.value, setForm, form)
             }
-            value={data ? actualValue.lastName : ""}
+            value={form.lastName}
           />
         </div>
         <div>
           <Button
             variant="contained"
             color="primary"
-            onClick={() => save(form, createMutate, history)}
+            onClick={() =>
+              save(
+                form,
+                createEmployeeMutate,
+                history,
+                props.match.params.empId,
+                updateEmployeeMutate
+              )
+            }
           >
             {btnText}
           </Button>

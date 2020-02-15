@@ -1,7 +1,7 @@
 import React from "react";
 import Header from "../common/header";
 import TableViewWithAction from "../common/tableView";
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import * as _ from "lodash";
 import { Link } from "react-router-dom";
@@ -18,6 +18,15 @@ export const GET_EMPLOYEES = gql`
     }
   }
 `;
+
+export const DELETE_EMPLOYEE = gql`
+  mutation deleteEmployee($id: ID!) {
+    deleteEmployee(id: $id) {
+      id
+    }
+  }
+`;
+
 const tableHeader = () => {
   return [
     { label: "FirstName", key: "firstName" },
@@ -37,15 +46,22 @@ const navEmpForm = () => {
   );
 };
 
-const deleteEmp = empId => {
-  console.log(empId);
+const deleteEmp = (empId, deleteEmployeeMutate) => {
+  deleteEmployeeMutate({
+    variables: { id: empId },
+    refetchQueries: [
+      {
+        query: GET_EMPLOYEES
+      }
+    ]
+  });
 };
 
 function Home() {
   const history = useHistory();
   const { data, loading, error } = useQuery(GET_EMPLOYEES);
+  const [deleteEmployeeMutate] = useMutation(DELETE_EMPLOYEE);
   const editEmp = empId => {
-    console.log(empId);
     history.push(`/form/${empId}`);
   };
   return (
@@ -56,6 +72,7 @@ function Home() {
           <TableViewWithAction
             bodyData={tableBody(data.listEmployees.items)}
             heading={tableHeader()}
+            deleteMutate={deleteEmployeeMutate}
             edit={editEmp}
             isAction={true}
             del={deleteEmp}

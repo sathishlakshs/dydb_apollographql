@@ -51,7 +51,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function TableViewWithAction(props) {
   const classes = useStyles();
-  const { isAction, heading, bodyData, edit, del } = props;
+  const { isAction, heading, bodyData, edit, del, deleteMutate } = props;
 
   return (
     <TableContainer component={Paper}>
@@ -93,7 +93,7 @@ export default function TableViewWithAction(props) {
                       <IconButton
                         aria-label="delete"
                         className={classes.margin}
-                        onClick={() => del(row.id)}
+                        onClick={() => del(row.id, deleteMutate)}
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
