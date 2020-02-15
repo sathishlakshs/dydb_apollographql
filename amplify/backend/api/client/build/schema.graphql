@@ -1,0 +1,267 @@
+type Employee {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  address: [Address]
+  skills: [Skill]
+}
+
+type Address {
+  id: ID!
+  line1: String
+  line2: String
+  city: String
+  state: String
+  zipcode: String
+}
+
+type Skill {
+  id: ID!
+  name: String
+}
+
+enum ModelSortDirection {
+  ASC
+  DESC
+}
+
+type ModelEmployeeConnection {
+  items: [Employee]
+  nextToken: String
+}
+
+input ModelStringInput {
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelIDInput {
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelIntInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelFloatInput {
+  ne: Float
+  eq: Float
+  le: Float
+  lt: Float
+  ge: Float
+  gt: Float
+  between: [Float]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelBooleanInput {
+  ne: Boolean
+  eq: Boolean
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelSizeInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+}
+
+input ModelEmployeeFilterInput {
+  id: ModelIDInput
+  firstName: ModelStringInput
+  lastName: ModelStringInput
+  and: [ModelEmployeeFilterInput]
+  or: [ModelEmployeeFilterInput]
+  not: ModelEmployeeFilterInput
+}
+
+type Query {
+  getEmployee(id: ID!): Employee
+  listEmployees(filter: ModelEmployeeFilterInput, limit: Int, nextToken: String): ModelEmployeeConnection
+  getAddress(id: ID!): Address
+  listAddresss(filter: ModelAddressFilterInput, limit: Int, nextToken: String): ModelAddressConnection
+  getSkill(id: ID!): Skill
+  listSkills(filter: ModelSkillFilterInput, limit: Int, nextToken: String): ModelSkillConnection
+}
+
+input CreateEmployeeInput {
+  id: ID
+  firstName: String!
+  lastName: String!
+}
+
+input UpdateEmployeeInput {
+  id: ID!
+  firstName: String
+  lastName: String
+}
+
+input DeleteEmployeeInput {
+  id: ID
+}
+
+type Mutation {
+  createEmployee(input: CreateEmployeeInput!, condition: ModelEmployeeConditionInput): Employee
+  updateEmployee(input: UpdateEmployeeInput!, condition: ModelEmployeeConditionInput): Employee
+  deleteEmployee(input: DeleteEmployeeInput!, condition: ModelEmployeeConditionInput): Employee
+  createAddress(input: CreateAddressInput!, condition: ModelAddressConditionInput): Address
+  updateAddress(input: UpdateAddressInput!, condition: ModelAddressConditionInput): Address
+  deleteAddress(input: DeleteAddressInput!, condition: ModelAddressConditionInput): Address
+  createSkill(input: CreateSkillInput!, condition: ModelSkillConditionInput): Skill
+  updateSkill(input: UpdateSkillInput!, condition: ModelSkillConditionInput): Skill
+  deleteSkill(input: DeleteSkillInput!, condition: ModelSkillConditionInput): Skill
+}
+
+input ModelEmployeeConditionInput {
+  firstName: ModelStringInput
+  lastName: ModelStringInput
+  and: [ModelEmployeeConditionInput]
+  or: [ModelEmployeeConditionInput]
+  not: ModelEmployeeConditionInput
+}
+
+enum ModelAttributeTypes {
+  binary
+  binarySet
+  bool
+  list
+  map
+  number
+  numberSet
+  string
+  stringSet
+  _null
+}
+
+type Subscription {
+  onCreateEmployee: Employee @aws_subscribe(mutations: ["createEmployee"])
+  onUpdateEmployee: Employee @aws_subscribe(mutations: ["updateEmployee"])
+  onDeleteEmployee: Employee @aws_subscribe(mutations: ["deleteEmployee"])
+  onCreateAddress: Address @aws_subscribe(mutations: ["createAddress"])
+  onUpdateAddress: Address @aws_subscribe(mutations: ["updateAddress"])
+  onDeleteAddress: Address @aws_subscribe(mutations: ["deleteAddress"])
+  onCreateSkill: Skill @aws_subscribe(mutations: ["createSkill"])
+  onUpdateSkill: Skill @aws_subscribe(mutations: ["updateSkill"])
+  onDeleteSkill: Skill @aws_subscribe(mutations: ["deleteSkill"])
+}
+
+type ModelAddressConnection {
+  items: [Address]
+  nextToken: String
+}
+
+input ModelAddressFilterInput {
+  id: ModelIDInput
+  line1: ModelStringInput
+  line2: ModelStringInput
+  city: ModelStringInput
+  state: ModelStringInput
+  zipcode: ModelStringInput
+  and: [ModelAddressFilterInput]
+  or: [ModelAddressFilterInput]
+  not: ModelAddressFilterInput
+}
+
+input CreateAddressInput {
+  id: ID
+  line1: String
+  line2: String
+  city: String
+  state: String
+  zipcode: String
+}
+
+input UpdateAddressInput {
+  id: ID!
+  line1: String
+  line2: String
+  city: String
+  state: String
+  zipcode: String
+}
+
+input DeleteAddressInput {
+  id: ID
+}
+
+input ModelAddressConditionInput {
+  line1: ModelStringInput
+  line2: ModelStringInput
+  city: ModelStringInput
+  state: ModelStringInput
+  zipcode: ModelStringInput
+  and: [ModelAddressConditionInput]
+  or: [ModelAddressConditionInput]
+  not: ModelAddressConditionInput
+}
+
+type ModelSkillConnection {
+  items: [Skill]
+  nextToken: String
+}
+
+input ModelSkillFilterInput {
+  id: ModelIDInput
+  name: ModelStringInput
+  and: [ModelSkillFilterInput]
+  or: [ModelSkillFilterInput]
+  not: ModelSkillFilterInput
+}
+
+input CreateSkillInput {
+  id: ID
+  name: String
+}
+
+input UpdateSkillInput {
+  id: ID!
+  name: String
+}
+
+input DeleteSkillInput {
+  id: ID
+}
+
+input ModelSkillConditionInput {
+  name: ModelStringInput
+  and: [ModelSkillConditionInput]
+  or: [ModelSkillConditionInput]
+  not: ModelSkillConditionInput
+}

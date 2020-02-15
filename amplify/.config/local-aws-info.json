@@ -1,0 +1,7 @@
+{
+    "dynamodb": {
+        "configLevel": "project",
+        "useProfile": true,
+        "profileName": "us-west-2-demo-user"
+    }
+}
