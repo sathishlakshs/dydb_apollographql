@@ -55,12 +55,12 @@ const useStyles = makeStyles(theme => ({
 
 const createEmp = async (firstName, lastName, createEmployeeMutate) => {
   const { data } = await createEmployeeMutate({
-    variables: { firstName, lastName },
-    refetchQueries: [
-      {
-        query: GET_EMPLOYEES
-      }
-    ]
+    variables: { firstName, lastName }
+    // refetchQueries: [
+    //   {
+    //     query: GET_EMPLOYEES
+    //   }
+    // ]
   });
   return data.createEmployee.id;
 };
@@ -154,6 +154,7 @@ function Empform(props) {
   const btnText = btnTxtChange(props.match.params.empId);
   const [state, setStateData] = useState({
     skill: "",
+    delIds: [],
     form: {
       firstName: "",
       lastName: "",
@@ -164,7 +165,6 @@ function Empform(props) {
   const { data } = useQuery(GET_EMPLOYEE_BY_ID, {
     variables: { id: props.match.params.empId, empId: props.match.params.empId }
   });
-  console.log(data);
   const [createEmployeeMutate, { loading, error }] = useMutation(
     CREATE_EMPLOYEE,
     {
@@ -173,7 +173,7 @@ function Empform(props) {
           data,
           createAddressMutate,
           createSkillMutate,
-          fakeData
+          state.form
         )
     }
   );
@@ -198,7 +198,15 @@ function Empform(props) {
       }
     }
   }, [data]);
+  const addresssStateChange = addresss => {
+    setStateData({ ...state, form: { ...state.form, addresss } });
+  };
+  const collectDelId = (id) => {
+    state.delIds.push(id);
+    setStateData({ ...state, delIds:  state.delIds});
+  }
   console.log(state.form);
+
   return (
     <>
       <Header label={"Employee Form"} />
@@ -251,11 +259,11 @@ function Empform(props) {
                 </Grid>
               </div>
               <div className="mt30">
-                {!_.isEmpty(state.form.addresss) && (
                   <AddresssForm
+                    ancestorSetState={addresssStateChange}
                     addresss={state.form.addresss ? state.form.addresss : []}
+                    collectDelId = {collectDelId}
                   />
-                )}
               </div>
             </form>
           </CardContent>
@@ -265,7 +273,7 @@ function Empform(props) {
               color="primary"
               onClick={() =>
                 save(
-                  fakeData,
+                  state.form,
                   createEmployeeMutate,
                   history,
                   props.match.params.empId,

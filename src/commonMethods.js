@@ -11,5 +11,5 @@ export const  employeesPartitioning = (emps, adds, skills) => {
 }
 
 export const dataTrim = (label, len) => {
-    return len > 0? label.substring(0, 10) + '... <span>' + '+ ' + len + ' more</span>' : label.substring(0, 10) + '...';
+    return len > 0?`${label.substring(0, 10)}... + ${len} more` : `${label.substring(0, 10)} ...`;
 }

@@ -18,7 +18,7 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import TableViewWithAction from "./tableView";
-import _ from "lodash";
+import * as _ from "lodash";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -63,9 +63,8 @@ const handleStateChange = (value, setState, state) => {
   state.form.state = value;
   setState({ ...state });
 };
-const del = () => {};
 
-const add = (setState, state, addresss) => {
+const add = (setState, state, addresss, ancestorSetState) => {
   state.form["cityName"] = cities.find(c => c.id === state.form.city).name;
   state.form["stateName"] = states.find(s => s.id === state.form.state).name;
   if (state.editIndex < 0) {
@@ -73,6 +72,7 @@ const add = (setState, state, addresss) => {
   } else {
     addresss[state.editIndex] = {...state.form};
   }
+  ancestorSetState(addresss);
   setState({cities:[], editIndex: -1, form: { line1: "", line2: "", zipcode: "", city: "", state: "" }});
 };
 
@@ -89,7 +89,7 @@ function AddresssForm(props) {
     cities: [],
     editIndex: -1
   });
-  const { addresss } = props;
+  const { addresss, ancestorSetState, collectDelId } = props;
   if (addresss) {
     locationNameCon(addresss);
   }
@@ -100,6 +100,13 @@ function AddresssForm(props) {
     state.editIndex = index;
     setData({ ...state });
   };
+
+  const del = (id, deleteMut, index) => {
+    if(id) {
+      collectDelId(id);
+    }
+    addresss.splice(index, 1);
+   };
 
   return (
     <>
@@ -151,7 +158,7 @@ function AddresssForm(props) {
                     }
                   >
                     {states.map(s => (
-                      <MenuItem value={s.id}>{s.name}</MenuItem>
+                      <MenuItem value={s.id} key={s.id}>{s.name}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>
@@ -176,7 +183,7 @@ function AddresssForm(props) {
                     }
                   >
                     {state.cities.map(c => (
-                      <MenuItem value={c.id}>{c.name}</MenuItem>
+                      <MenuItem value={c.id} key={c.id}>{c.name}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>
@@ -202,13 +209,13 @@ function AddresssForm(props) {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => add(setData, state, addresss)}
+            onClick={() => add(setData, state, addresss, ancestorSetState)}
           >
             {"Add"}
           </Button>
         </CardActions>
         <CardContent>
-          {addresss && (
+          {addresss && !_.isEmpty(addresss) && (
             <TableViewWithAction
               bodyData={addresss}
               heading={tableHeader()}
