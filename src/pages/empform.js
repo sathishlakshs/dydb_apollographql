@@ -154,7 +154,8 @@ function Empform(props) {
   const btnText = btnTxtChange(props.match.params.empId);
   const [state, setStateData] = useState({
     skill: "",
-    delIds: [],
+    delAddressIds: [],
+    delSkillIds: [],
     form: {
       firstName: "",
       lastName: "",
@@ -181,8 +182,14 @@ function Empform(props) {
   const [createSkillMutate] = useMutation(CREATE_SKILL);
   const [updateEmployeeMutate] = useMutation(UPDATE_EMPLOYEE);
   const classes = useStyles();
-  const formSkillsChange = (name, value) => {
-    setStateData({ ...state, form: { ...state.form, [name]: value } });
+  const formSkillsChange = (name, value, skillId) => {
+    if(skillId) {
+      state.delSkillIds.push(skillId);
+      state.form.skills = value;
+      setStateData({...state});
+    } else {
+      setStateData({ ...state, form: { ...state.form, [name]: value } });
+    }
   };
   useEffect(() => {
     if (data) {
@@ -202,10 +209,10 @@ function Empform(props) {
     setStateData({ ...state, form: { ...state.form, addresss } });
   };
   const collectDelId = (id) => {
-    state.delIds.push(id);
-    setStateData({ ...state, delIds:  state.delIds});
+    state.delAddressIds.push(id);
+    setStateData({ ...state, delAddressIds:  state.delAddressIds});
   }
-  console.log(state.form);
+  console.log(state);
 
   return (
     <>

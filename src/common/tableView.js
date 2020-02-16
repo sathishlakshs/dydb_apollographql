@@ -58,7 +58,7 @@ export default function TableViewWithAction(props) {
   const classes = useStyles();
   const { isAction, heading, bodyData, edit, del, deleteMutate } = props;
   // console.log(rows(bodyData, heading));
-  console.log(bodyData);
+  // console.log(bodyData);
   return (
     <TableContainer component={Paper}>
       <Table className={classes.table} aria-label="customized table">

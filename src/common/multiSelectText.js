@@ -10,14 +10,15 @@ const keyPress = (name, e, ancestorStateChange, state, setValue) => {
       const temp = [...state.form.skills];
       temp.push({ name: e.target.value });
       setValue("");
-      ancestorStateChange(name, temp);
+      ancestorStateChange(name, temp, undefined);
     }
   }
 };
 
 const handleDelete = (name, chips, index, ancestorStateChange) => {
+  const id = chips[index].id;
   chips.splice(index, 1);
-  ancestorStateChange(name, [...chips]);
+  ancestorStateChange(name, [...chips], id);
 };
 
 function MultiSelectTextField(props) {
@@ -41,7 +42,9 @@ function MultiSelectTextField(props) {
               // avatar={<Avatar alt="Natacha" src="/static/images/avatar/1.jpg" />}
               key={index}
               label={c.name}
-              onDelete={e => handleDelete(e, chips, index, ancestorStateChange)}
+              onDelete={e =>
+                handleDelete(e, [...chips], index, ancestorStateChange)
+              }
             />
           ))}
         </div>
