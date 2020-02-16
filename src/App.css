@@ -1,5 +1,5 @@
 .App {
-  
+  height: calc(100vh);
 }
 
 .App-logo {
@@ -52,4 +52,75 @@
 
 .pt30 {
   padding-top: 30px;
+}
+
+.ml40 {
+  margin-left: 40px;
+}
+
+.mr40 {
+  margin-right: 40px;
+}
+
+.mt40 {
+  margin-top: 40px;
+}
+
+.ml9rem {
+  margin-left: 9rem;
+}
+
+.mr9rem {
+  margin-right: 9rem;
+}
+
+.right {
+  float: right;
+}
+
+.bgBlueAsh {
+  background-color: #f1f2f3;
+}
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: 0px !important;
+    margin-left: 0px !important;
+}
+
+.col-1 {
+  width: 8.3333333333%;
+}
+.col-2 {
+  width: 16.666666666%;
+}
+.col-3 {
+  width: 25%;
+}
+.col-4 {
+  width: 33.333333333%;
+}
+.col-5 {
+  width: 41.666666666%;
+}
+.col-6 {
+  width: 50%;
+}
+.col-7 {
+  width: 58.33333333%;
+}
+.col-8 {
+  width: 66.66666666%;
+}
+.col-9 {
+  width: 75%;
+}
+.col-10 {
+  width: 83.33333333%;
+}
+.col-11 {
+  width: 91.66666666%;
+}
+.col-12 {
+  width: 100%;
 }

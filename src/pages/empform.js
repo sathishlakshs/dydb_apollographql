@@ -1,12 +1,39 @@
 import React, { useState, useEffect } from "react";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
+import Card from "@material-ui/core/Card";
+import CardActions from "@material-ui/core/CardActions";
+import CardContent from "@material-ui/core/CardContent";
 import { useMutation, useQuery } from "@apollo/react-hooks";
 import Button from "@material-ui/core/Button";
 import gql from "graphql-tag";
 import { useHistory } from "react-router-dom";
-import { GET_EMPLOYEES } from "./home";
+import { GET_EMPLOYEES, GET_EMPLOYEE_BY_ID } from "../graphql/queries";
 import _ from "lodash";
+import AddresssForm from "../common/addressForm";
+import {
+  CREATE_EMPLOYEE,
+  CREATE_ADDRESS,
+  CREATE_SKILL,
+  UPDATE_EMPLOYEE
+} from "../graphql/mutations";
+import Header from "../common/header";
+import MultiSelectTextField from "../common/multiSelectText";
+
+const fakeData = {
+  firstName: "sathish",
+  lastName: "kumar",
+  addresss: [
+    {
+      line1: "9th cross",
+      line2: "nethaji street",
+      zipcode: "600042",
+      city: "1",
+      state: "1"
+    }
+  ],
+  skills: [{ name: "reactjs" }]
+};
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -14,45 +41,70 @@ const useStyles = makeStyles(theme => ({
       margin: theme.spacing(1),
       width: 200
     }
+  },
+  minWidth: 275,
+  title: {
+    fontSize: 14
+  },
+  pos: {
+    marginBottom: 12
   }
 }));
 
-export const CREATE_EMPLOYEE = gql`
-  mutation createEmployee($firstName: String!, $lastName: String!) {
-    createEmployee(input: { firstName: $firstName, lastName: $lastName }) {
-      id
-      firstName
-      lastName
-    }
-  }
-`;
-
-export const GET_EMPLOYEE = gql`
-  query empById($id: ID!) {
-    getEmployee(id: $id) {
-      id
-      firstName
-      lastName
-    }
-  }
-`;
-
-export const UPDATE_EMPLOYEE = gql`
-  mutation updateEmployee($id: ID!, $firstName: String!, $lastName: String!) {
-    updateEmployee(
-      input: { id: $id, firstName: $firstName, lastName: $lastName }
-    ) {
-      firstName
-      lastName
-    }
-  }
-`;
-
-const handleChange = (name, value, setForm, form) => {
-  setForm({ ...form, [name]: value });
+const createEmp = async (firstName, lastName, createEmployeeMutate) => {
+  const { data } = await createEmployeeMutate({
+    variables: { firstName, lastName },
+    refetchQueries: [
+      {
+        query: GET_EMPLOYEES
+      }
+    ]
+  });
+  return data.createEmployee.id;
 };
 
-const save = (
+const createAddresss = async (addresss, createAddressMutate) => {
+  for (const a of addresss) {
+    const data = await createAddressMutate({
+      variables: {
+        line1: a.line1,
+        line2: a.line2,
+        city: a.city,
+        state: a.state,
+        zipcode: a.zipcode,
+        empId: a.empId
+      }
+    });
+  }
+};
+
+const createSkills = async (skills, createSkillMutate) => {
+  for (const s of skills) {
+    const data = await createSkillMutate({
+      variables: { name: s.name, empId: s.empId }
+    });
+  }
+};
+
+const createAddressAndSkill = (
+  data,
+  createAddressMutate,
+  createSkillMutate,
+  form
+) => {
+  if (data.createEmployee.id) {
+    form.addresss.map(a => {
+      a["empId"] = data.createEmployee.id;
+    });
+    form.skills.map(s => {
+      s["empId"] = data.createEmployee.id;
+    });
+    createAddresss(form.addresss, createAddressMutate);
+    createSkills(form.skills, createSkillMutate);
+  }
+};
+
+const save = async (
   form,
   createEmployeeMutate,
   history,
@@ -62,7 +114,11 @@ const save = (
   if (form.firstName && form.lastName) {
     if (empId && empId !== "0") {
       updateEmployeeMutate({
-        variables: {id: empId, firstName: form.firstName, lastName: form.lastName },
+        variables: {
+          id: empId,
+          firstName: form.firstName,
+          lastName: form.lastName
+        },
         refetchQueries: [
           {
             query: GET_EMPLOYEES
@@ -70,87 +126,136 @@ const save = (
         ]
       });
     } else {
-      createEmployeeMutate({
-        variables: { firstName: form.firstName, lastName: form.lastName },
-        refetchQueries: [
-          {
-            query: GET_EMPLOYEES
-          }
-        ]
-      });
+      await createEmp(form.firstName, form.lastName, createEmployeeMutate);
     }
     history.push("/home");
   }
 };
 
-const btnTxtChange = (empId) => {
-  if(empId !== "0" && empId) {
+const handleFormChange = (name, value, setStateData, state) => {
+  setStateData({ ...state, form: { ...state.form, [name]: value } });
+};
+
+const handleChange = (name, value, setStateData, state) => {
+  setStateData({ ...state, [name]: value });
+};
+
+const btnTxtChange = empId => {
+  if (empId !== "0" && empId) {
     return "Update";
-  } 
+  }
   return "Save";
-}
+};
 
 function Empform(props) {
   const history = useHistory();
   const btnText = btnTxtChange(props.match.params.empId);
-  const [form, setForm] = useState({ firstName: "", lastName: "", address: [], skills: [] });
-  const { data } = useQuery(
-    GET_EMPLOYEE,
+  const [state, setStateData] = useState({
+    skill: "",
+    form: {
+      firstName: "",
+      lastName: "",
+      address: [],
+      skills: []
+    }
+  });
+  const { data } = useQuery(GET_EMPLOYEE_BY_ID, {
+    variables: { id: props.match.params.empId }
+  });
+  const [createEmployeeMutate, { loading, error }] = useMutation(
+    CREATE_EMPLOYEE,
     {
-      variables: { id: props.match.params.empId }
+      onCompleted: data =>
+        createAddressAndSkill(
+          data,
+          createAddressMutate,
+          createSkillMutate,
+          fakeData
+        )
     }
   );
-  const [createEmployeeMutate, { loading, error }] = useMutation(CREATE_EMPLOYEE);
+  const [createAddressMutate] = useMutation(CREATE_ADDRESS);
+  const [createSkillMutate] = useMutation(CREATE_SKILL);
   const [updateEmployeeMutate] = useMutation(UPDATE_EMPLOYEE);
   const classes = useStyles();
+  const formSkillsChange = (name, value) => {
+    setStateData({ ...state, form: { ...state.form, [name]: value } });
+  };
   useEffect(() => {
     if (data) {
       if (data.getEmployee) {
-        setForm(data.getEmployee);
+        setStateData(data.getEmployee);
       }
     }
   }, [data]);
+  console.log(state);
   return (
     <>
-      <form className={classes.root} noValidate autoComplete="off">
-        <div>
-          <TextField
-            required
-            id="standard-required"
-            label="FirstName"
-            onChange={e =>
-              handleChange("firstName", e.target.value, setForm, form)
-            }
-            value={form.firstName}
-          />
-          <TextField
-            required
-            id="standard-required"
-            label="LastName"
-            onChange={e =>
-              handleChange("lastName", e.target.value, setForm, form)
-            }
-            value={form.lastName}
-          />
-        </div>
-        <div>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() =>
-              save(
-                form,
-                createEmployeeMutate,
-                history,
-                props.match.params.empId,
-                updateEmployeeMutate
-              )
-            }
-          >
-            {btnText}
-          </Button>
-        </div>
-      </form>
+      <Header label={"Employee Form"} />
+      <div className="ml9rem mr9rem mt40">
+        <Card className={classes.root}>
+          <CardContent>
+            <form className={classes.root} noValidate autoComplete="off">
+              <div>
+                <TextField
+                  required
+                  id="standard-required"
+                  label="FirstName"
+                  onChange={e =>
+                    handleFormChange(
+                      "firstName",
+                      e.target.value,
+                      setStateData,
+                      state
+                    )
+                  }
+                  value={state.form.firstName}
+                />
+                <TextField
+                  required
+                  id="standard-required"
+                  label="LastName"
+                  onChange={e =>
+                    handleFormChange(
+                      "lastName",
+                      e.target.value,
+                      setStateData,
+                      state
+                    )
+                  }
+                  value={state.form.lastName}
+                />
+                <MultiSelectTextField
+                  fieldKey={"skills"}
+                  ancestorStateChange={formSkillsChange}
+                  state={state}
+                  chips={state.form.skills}
+                />
+              </div>
+              <AddresssForm />
+            </form>
+          </CardContent>
+          <CardActions className="right">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() =>
+                save(
+                  fakeData,
+                  createEmployeeMutate,
+                  history,
+                  props.match.params.empId,
+                  updateEmployeeMutate,
+                  createAddressMutate,
+                  createSkillMutate
+                )
+              }
+            >
+              {btnText}
+            </Button>
+          </CardActions>
+        </Card>
+      </div>
     </>
   );
 }

@@ -30,15 +30,20 @@ const StyledTableRow = withStyles(theme => ({
   }
 }))(TableRow);
 
-function createData(firstName, lastName, id) {
-  return { firstName, lastName, id};
-}
+// function createData(data, keys) {
+//   data.filter(d => {
+//     const temp = {}
+//     keys.filter(k => { temp[k] = d[key]; return ;});
+//   });
+//   return data.map(d => d)
+//   return { firstName, lastName, address, skill, id};
+// }
 
-const rows = (data, heading) => {
-  return data.map(item =>
-    createData(item[heading[0].key], item[heading[1].key], item['id'])
-  );
-};
+// const rows = (data, heading) => {
+//   return  createData(data, [...heading.map(item => item.key, 'id')]);
+//   //  createData(item[heading[0].key], item[heading[1].key], item[heading[2].key], item[heading[3].key], item['id'])
+//   // );
+// };
 
 const useStyles = makeStyles(theme => ({
   table: {
@@ -52,7 +57,7 @@ const useStyles = makeStyles(theme => ({
 export default function TableViewWithAction(props) {
   const classes = useStyles();
   const { isAction, heading, bodyData, edit, del, deleteMutate } = props;
-
+// console.log(rows(bodyData, heading));
   return (
     <TableContainer component={Paper}>
       <Table className={classes.table} aria-label="customized table">
@@ -69,11 +74,11 @@ export default function TableViewWithAction(props) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows(bodyData, heading).map((row, index) => (
+          {bodyData.map((bData, index) => (
             <StyledTableRow key={index}>
-              {props.heading.map((item, index) => (
+              {props.heading.map((h, index) => (
                 <StyledTableCell component="th" scope="row" key={index}>
-                  {row[props.heading[index].key]}
+                  {bData[h.key]}
                 </StyledTableCell>
               ))}
               {
@@ -84,7 +89,7 @@ export default function TableViewWithAction(props) {
                       <IconButton
                         aria-label="delete"
                         className={classes.margin}
-                        onClick={() => edit(row.id)}
+                        onClick={() => edit(bData.id)}
                       >
                         <EditIcon fontSize="small"  />
                       </IconButton>
@@ -93,7 +98,7 @@ export default function TableViewWithAction(props) {
                       <IconButton
                         aria-label="delete"
                         className={classes.margin}
-                        onClick={() => del(row.id, deleteMutate)}
+                        onClick={() => del(bData.id, deleteMutate)}
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>

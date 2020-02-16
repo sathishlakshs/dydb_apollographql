@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function Header(props) {
   const classes = useStyles();
-  const {addNew} = props;
+  const {addNew, label} = props;
 
   return (
     <div className={classes.root}>
@@ -33,12 +33,14 @@ export default function Header(props) {
         <Toolbar>
           <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
           <Typography variant="h6" className={classes.title}>
-              Employee
+              {label}
           </Typography>
           </IconButton>
           <Typography variant="h6" className={classes.title}>
           </Typography>
-  <Button color="inherit">{addNew}</Button>
+          {
+            addNew && <Button color="inherit">{addNew}</Button>
+          }
         </Toolbar>
       </AppBar>
     </div>

@@ -1,5 +1,46 @@
+import gql from "graphql-tag";
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
+
+export const GET_EMPLOYEE_BY_ID = gql`
+  query empById($id: ID!) {
+    getEmployee(id: $id) {
+      id
+      firstName
+      lastName
+    }
+  }
+`;
+
+export const GET_EMPLOYEES = gql`
+  query {
+    listEmployees {
+      items {
+        id
+        firstName
+        lastName
+      }
+    }
+    listAddresss {
+      items {
+        id
+        line1
+        line2
+        zipcode
+        state
+        city
+        empId
+      }
+    }
+    listSkills {
+      items {
+        id
+        name
+        empId
+      }
+    }
+  }
+`;
 
 export const getEmployee = /* GraphQL */ `
   query GetEmployee($id: ID!) {
@@ -14,10 +55,12 @@ export const getEmployee = /* GraphQL */ `
         city
         state
         zipcode
+        empId
       }
       skills {
         id
         name
+        empId
       }
     }
   }
@@ -40,10 +83,12 @@ export const listEmployees = /* GraphQL */ `
           city
           state
           zipcode
+          empId
         }
         skills {
           id
           name
+          empId
         }
       }
       nextToken
@@ -59,6 +104,7 @@ export const getAddress = /* GraphQL */ `
       city
       state
       zipcode
+      empId
     }
   }
 `;
@@ -76,6 +122,7 @@ export const listAddresss = /* GraphQL */ `
         city
         state
         zipcode
+        empId
       }
       nextToken
     }
@@ -86,6 +133,7 @@ export const getSkill = /* GraphQL */ `
     getSkill(id: $id) {
       id
       name
+      empId
     }
   }
 `;
@@ -99,6 +147,7 @@ export const listSkills = /* GraphQL */ `
       items {
         id
         name
+        empId
       }
       nextToken
     }

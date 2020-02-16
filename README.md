@@ -1,13 +1,13 @@
 # dydb_apollographql
 /**************************** server ***************************************/
 
-cmd: npm install -g amplify/cli
+cmd: npm install -g @aws-amplify/cli
 
 cmd: amplify configure
 
 choose the region
 
-given the username: just like amplify-cli-us-west-2-user
+given the username: just like amplify-cli-us-west-2-user or something
 // IAM console will open
 
 click "nexpermission" => "nexttag" => "next: review" => "create user" then
@@ -20,7 +20,7 @@ afterward given the "profile name" for new user
 
 /* client Side */
 
-cmd:  create-react-app client
+cmd:  npx create-react-app my-app
 
 cmd: amplify init
 

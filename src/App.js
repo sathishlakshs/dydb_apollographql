@@ -12,7 +12,7 @@ import Empform from "./pages/empform";
 
 function App(props) {
   return (
-    <div className="App">
+    <div className="App bgBlueAsh">
       <Router>
         <Switch>
           <Route path="/form/:empId"render={props => <Empform {...props}/>}>
