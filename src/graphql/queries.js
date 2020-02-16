@@ -3,11 +3,33 @@ import gql from "graphql-tag";
 // this is an auto generated file. This will be overwritten
 
 export const GET_EMPLOYEE_BY_ID = gql`
-  query empById($id: ID!) {
+  query empById($id: ID!, $empId: String) {
     getEmployee(id: $id) {
       id
       firstName
       lastName
+    }
+    listAddresss(filter: {
+      empId:{contains: $empId}
+    }) {
+      items {
+        id
+        line1
+        line2
+        city
+        state
+        zipcode
+        empId
+      }
+    }
+    listSkills(filter: {
+      empId:{contains: $empId}
+    }) {
+      items {
+        id
+        name
+        empId
+      }
     }
   }
 `;

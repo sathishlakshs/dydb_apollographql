@@ -57,7 +57,8 @@ const useStyles = makeStyles(theme => ({
 export default function TableViewWithAction(props) {
   const classes = useStyles();
   const { isAction, heading, bodyData, edit, del, deleteMutate } = props;
-// console.log(rows(bodyData, heading));
+  // console.log(rows(bodyData, heading));
+  console.log(bodyData);
   return (
     <TableContainer component={Paper}>
       <Table className={classes.table} aria-label="customized table">
@@ -81,32 +82,30 @@ export default function TableViewWithAction(props) {
                   {bData[h.key]}
                 </StyledTableCell>
               ))}
-              {
-              isAction ? (
+              {isAction ? (
                 <>
                   <StyledTableCell component="th" scope="row">
                     <span>
                       <IconButton
                         aria-label="delete"
                         className={classes.margin}
-                        onClick={() => edit(bData.id)}
+                        onClick={() => edit(bData.id, index)}
                       >
-                        <EditIcon fontSize="small"  />
+                        <EditIcon fontSize="small" />
                       </IconButton>
                     </span>
                     <span style={{ marginLeft: "25px" }}>
                       <IconButton
                         aria-label="delete"
                         className={classes.margin}
-                        onClick={() => del(bData.id, deleteMutate)}
+                        onClick={() => del(bData.id, deleteMutate, index)}
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
                     </span>
                   </StyledTableCell>
                 </>
-              ) : null
-              }
+              ) : null}
             </StyledTableRow>
           ))}
         </TableBody>

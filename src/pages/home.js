@@ -66,7 +66,7 @@ function Home() {
   const { data, loading, error } = useQuery(GET_EMPLOYEES);
   let modifyData = [];
   if (data) {
-    // modifyData = employeesPartitioning([...data.listEmployees.items], [...data.listAddresss.items], [...data.listSkills.items]);
+    modifyData = employeesPartitioning([...data.listEmployees.items], [...data.listAddresss.items], [...data.listSkills.items]);
   }
   const [deleteEmployeeMutate] = useMutation(DELETE_EMPLOYEE);
   const editEmp = empId => {
@@ -75,7 +75,7 @@ function Home() {
   return (
     <>
       <Header addNew={navEmpForm()} label={"EmployeeList"}/>
-      {/* <div className="pl30 pr30 pt30">
+      <div className="pl30 pr30 pt30">
         {!loading ? (
           <TableViewWithAction
             bodyData={tableBody(modifyData)}
@@ -88,7 +88,7 @@ function Home() {
         ) : (
           "Data not found"
         )}
-      </div> */}
+      </div>
     </>
   );
 }

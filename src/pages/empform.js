@@ -19,6 +19,8 @@ import {
 } from "../graphql/mutations";
 import Header from "../common/header";
 import MultiSelectTextField from "../common/multiSelectText";
+import Grid from "@material-ui/core/Grid";
+import { employeesPartitioning } from "../commonMethods";
 
 const fakeData = {
   firstName: "sathish",
@@ -39,7 +41,7 @@ const useStyles = makeStyles(theme => ({
   root: {
     "& .MuiTextField-root": {
       margin: theme.spacing(1),
-      width: 200
+      width: "100%"
     }
   },
   minWidth: 275,
@@ -160,8 +162,9 @@ function Empform(props) {
     }
   });
   const { data } = useQuery(GET_EMPLOYEE_BY_ID, {
-    variables: { id: props.match.params.empId }
+    variables: { id: props.match.params.empId, empId: props.match.params.empId }
   });
+  console.log(data);
   const [createEmployeeMutate, { loading, error }] = useMutation(
     CREATE_EMPLOYEE,
     {
@@ -184,11 +187,18 @@ function Empform(props) {
   useEffect(() => {
     if (data) {
       if (data.getEmployee) {
-        setStateData(data.getEmployee);
+        setStateData({
+          ...state,
+          form: employeesPartitioning(
+            [{ ...data.getEmployee }],
+            [...data.listAddresss.items],
+            [...data.listSkills.items]
+          )[0]
+        });
       }
     }
   }, [data]);
-  console.log(state);
+  console.log(state.form);
   return (
     <>
       <Header label={"Employee Form"} />
@@ -197,42 +207,56 @@ function Empform(props) {
           <CardContent>
             <form className={classes.root} noValidate autoComplete="off">
               <div>
-                <TextField
-                  required
-                  id="standard-required"
-                  label="FirstName"
-                  onChange={e =>
-                    handleFormChange(
-                      "firstName",
-                      e.target.value,
-                      setStateData,
-                      state
-                    )
-                  }
-                  value={state.form.firstName}
-                />
-                <TextField
-                  required
-                  id="standard-required"
-                  label="LastName"
-                  onChange={e =>
-                    handleFormChange(
-                      "lastName",
-                      e.target.value,
-                      setStateData,
-                      state
-                    )
-                  }
-                  value={state.form.lastName}
-                />
-                <MultiSelectTextField
-                  fieldKey={"skills"}
-                  ancestorStateChange={formSkillsChange}
-                  state={state}
-                  chips={state.form.skills}
-                />
+                <Grid container spacing={3}>
+                  <Grid item xs={4}>
+                    <TextField
+                      required
+                      id="standard-required"
+                      label="FirstName"
+                      onChange={e =>
+                        handleFormChange(
+                          "firstName",
+                          e.target.value,
+                          setStateData,
+                          state
+                        )
+                      }
+                      value={state.form.firstName}
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      required
+                      id="standard-required"
+                      label="LastName"
+                      onChange={e =>
+                        handleFormChange(
+                          "lastName",
+                          e.target.value,
+                          setStateData,
+                          state
+                        )
+                      }
+                      value={state.form.lastName}
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <MultiSelectTextField
+                      fieldKey={"skills"}
+                      ancestorStateChange={formSkillsChange}
+                      state={state}
+                      chips={state.form.skills}
+                    />
+                  </Grid>
+                </Grid>
               </div>
-              <AddresssForm />
+              <div className="mt30">
+                {!_.isEmpty(state.form.addresss) && (
+                  <AddresssForm
+                    addresss={state.form.addresss ? state.form.addresss : []}
+                  />
+                )}
+              </div>
             </form>
           </CardContent>
           <CardActions className="right">

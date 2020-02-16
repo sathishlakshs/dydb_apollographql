@@ -39,6 +39,7 @@ function MultiSelectTextField(props) {
           {chips.map((c, index) => (
             <Chip
               // avatar={<Avatar alt="Natacha" src="/static/images/avatar/1.jpg" />}
+              key={index}
               label={c.name}
               onDelete={e => handleDelete(e, chips, index, ancestorStateChange)}
             />
