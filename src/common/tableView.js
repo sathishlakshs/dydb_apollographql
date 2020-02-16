@@ -98,7 +98,7 @@ export default function TableViewWithAction(props) {
                       <IconButton
                         aria-label="delete"
                         className={classes.margin}
-                        onClick={() => del(bData.id, deleteMutate, index)}
+                        onClick={() => del(bData.id, deleteMutate, index, bData)}
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>

@@ -2,6 +2,67 @@ import gql from "graphql-tag";
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const UPDATE_ADDRESS =  gql`
+mutation updateAddress($id: ID!, $line1: String!, $line2: String!, $state: String!, $city: String!, $zipcode: String!, $empId: String!) {
+  updateAddress(
+    input: { id: $id,  line1: $line1, line2: $line2, state: $state, city: $city, zipcode: $zipcode, empId: $empId }
+  ) {
+    id
+    line1
+    line2
+    state
+    city
+    zipcode
+    empId
+  }
+}
+`;
+
+export const UPDATE_SKILL =  gql`
+mutation updateSkill($id: ID!, $name: String!, $empId: String!) {
+  updateSkill(
+    input: { id: $id,  name: $name, empId: $empId }
+  ) {
+    id
+    name
+    empId
+  }
+}
+`;
+
+export const UPDATE_EMPLOYEE = gql`
+  mutation updateEmployee($id: ID!, $firstName: String!, $lastName: String!) {
+    updateEmployee(
+      input: { id: $id, firstName: $firstName, lastName: $lastName }
+    ) {
+      firstName
+      lastName
+    }
+  }
+`;
+
+export const DELETE_EMPLOYEE = gql`
+  mutation deleteEmployee($id: ID!) {
+    deleteEmployee(input: { id: $id }) {
+      id
+    }
+  }
+`;
+
+export const DELETE_SKILL =gql`
+mutation deleteSkill($id: ID!) {
+  deleteSkill(input: { id: $id }) {
+    id
+  }
+}`;
+
+export const DELETE_ADDRESS = gql`
+mutation deleteAddress($id: ID!) {
+  deleteAddress(input: { id: $id }) {
+    id
+  }
+}`;
+
 export const CREATE_EMPLOYEE = gql`
   mutation createEmployee($firstName: String!, $lastName: String!) {
     createEmployee(input: { firstName: $firstName, lastName: $lastName }) {
@@ -26,17 +87,6 @@ mutation createSkill($name: String!, $empId: String! ) {
     id
   }
 }
-`;
-
-export const UPDATE_EMPLOYEE = gql`
-  mutation updateEmployee($id: ID!, $firstName: String!, $lastName: String!) {
-    updateEmployee(
-      input: { id: $id, firstName: $firstName, lastName: $lastName }
-    ) {
-      firstName
-      lastName
-    }
-  }
 `;
 
 

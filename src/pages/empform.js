@@ -15,7 +15,11 @@ import {
   CREATE_EMPLOYEE,
   CREATE_ADDRESS,
   CREATE_SKILL,
-  UPDATE_EMPLOYEE
+  UPDATE_EMPLOYEE,
+  DELETE_ADDRESS,
+  DELETE_SKILL,
+  UPDATE_ADDRESS,
+  UPDATE_SKILL
 } from "../graphql/mutations";
 import Header from "../common/header";
 import MultiSelectTextField from "../common/multiSelectText";
@@ -56,11 +60,6 @@ const useStyles = makeStyles(theme => ({
 const createEmp = async (firstName, lastName, createEmployeeMutate) => {
   const { data } = await createEmployeeMutate({
     variables: { firstName, lastName }
-    // refetchQueries: [
-    //   {
-    //     query: GET_EMPLOYEES
-    //   }
-    // ]
   });
   return data.createEmployee.id;
 };
@@ -111,25 +110,12 @@ const save = async (
   createEmployeeMutate,
   history,
   empId,
-  updateEmployeeMutate
+  updateEmployeeMutate,
+  delSkillIds,
+  delAddressIds
 ) => {
   if (form.firstName && form.lastName) {
-    if (empId && empId !== "0") {
-      updateEmployeeMutate({
-        variables: {
-          id: empId,
-          firstName: form.firstName,
-          lastName: form.lastName
-        },
-        refetchQueries: [
-          {
-            query: GET_EMPLOYEES
-          }
-        ]
-      });
-    } else {
-      await createEmp(form.firstName, form.lastName, createEmployeeMutate);
-    }
+    await createEmp(form.firstName, form.lastName, createEmployeeMutate);
     history.push("/home");
   }
 };
@@ -142,16 +128,8 @@ const handleChange = (name, value, setStateData, state) => {
   setStateData({ ...state, [name]: value });
 };
 
-const btnTxtChange = empId => {
-  if (empId !== "0" && empId) {
-    return "Update";
-  }
-  return "Save";
-};
-
 function Empform(props) {
   const history = useHistory();
-  const btnText = btnTxtChange(props.match.params.empId);
   const [state, setStateData] = useState({
     skill: "",
     delAddressIds: [],
@@ -181,16 +159,22 @@ function Empform(props) {
   const [createAddressMutate] = useMutation(CREATE_ADDRESS);
   const [createSkillMutate] = useMutation(CREATE_SKILL);
   const [updateEmployeeMutate] = useMutation(UPDATE_EMPLOYEE);
+  const [updateAddressMutate] = useMutation(UPDATE_ADDRESS);
+  const [updateSkillMutate] = useMutation(UPDATE_SKILL);
+  const [deleteAddressMutate] = useMutation(DELETE_ADDRESS);
+  const [deleteSkillMutate] = useMutation(DELETE_SKILL);
   const classes = useStyles();
+
   const formSkillsChange = (name, value, skillId) => {
-    if(skillId) {
+    if (skillId) {
       state.delSkillIds.push(skillId);
       state.form.skills = value;
-      setStateData({...state});
+      setStateData({ ...state });
     } else {
       setStateData({ ...state, form: { ...state.form, [name]: value } });
     }
   };
+
   useEffect(() => {
     if (data) {
       if (data.getEmployee) {
@@ -205,13 +189,92 @@ function Empform(props) {
       }
     }
   }, [data]);
+
   const addresssStateChange = addresss => {
     setStateData({ ...state, form: { ...state.form, addresss } });
   };
-  const collectDelId = (id) => {
+
+  const collectDelId = id => {
     state.delAddressIds.push(id);
-    setStateData({ ...state, delAddressIds:  state.delAddressIds});
-  }
+    setStateData({ ...state, delAddressIds: state.delAddressIds });
+  };
+
+  const Update = async () => {
+    if (props.match.params.empId && props.match.params.empId !== "0") {
+      if (!_.isEmpty(state.delSkillIds)) {
+        for (const s of state.delSkillIds) {
+          const data = await deleteSkillMutate({
+            variables: { id: s }
+          });
+        }
+      }
+      if (!_.isEmpty(state.delAddressIds)) {
+        for (const a of state.delAddressIds) {
+          const data = await deleteAddressMutate({
+            variables: { id: a }
+          });
+        }
+      }
+      for (const a of state.form.addresss) {
+        if (a.id) {
+          await updateAddressMutate({
+            variables: {
+              id: a.id,
+              line1: a.line1,
+              line2: a.line2,
+              state: a.state,
+              city: a.city,
+              zipcode: a.zipcode,
+              empId: a.empId
+            }
+          });
+        } else {
+         await createAddressMutate({
+            variables: {
+              line1: a.line1,
+              line2: a.line2,
+              city: a.city,
+              state: a.state,
+              zipcode: a.zipcode,
+              empId: props.match.params.empId
+            }
+          });
+        }
+      }
+      for (const s of state.form.skills) {
+        if (s.id) {
+          await updateSkillMutate({
+            variables: {
+              id: s.id,
+              name: s.name,
+              empId: s.empId
+            }
+          });
+        } else {
+         await createSkillMutate({
+            variables: {
+              name: s.name,
+              empId: props.match.params.empId
+            }
+          });
+        }
+      }
+      await updateEmployeeMutate({
+        variables: {
+          id: props.match.params.empId,
+          firstName: state.form.firstName,
+          lastName: state.form.lastName
+        },
+        refetchQueries: [
+          {
+            query: GET_EMPLOYEES
+          }
+        ]
+      });
+      history.push("/home");
+    }
+  };
+
   console.log(state);
 
   return (
@@ -266,32 +329,44 @@ function Empform(props) {
                 </Grid>
               </div>
               <div className="mt30">
-                  <AddresssForm
-                    ancestorSetState={addresssStateChange}
-                    addresss={state.form.addresss ? state.form.addresss : []}
-                    collectDelId = {collectDelId}
-                  />
+                <AddresssForm
+                  ancestorSetState={addresssStateChange}
+                  addresss={state.form.addresss ? state.form.addresss : []}
+                  collectDelId={collectDelId}
+                />
               </div>
             </form>
           </CardContent>
           <CardActions className="right">
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() =>
-                save(
-                  state.form,
-                  createEmployeeMutate,
-                  history,
-                  props.match.params.empId,
-                  updateEmployeeMutate,
-                  createAddressMutate,
-                  createSkillMutate
-                )
-              }
-            >
-              {btnText}
-            </Button>
+            {props.match.params.empId !== "0" && props.match.params.empId ? (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => Update()}
+              >
+                Update
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() =>
+                  save(
+                    state.form,
+                    createEmployeeMutate,
+                    history,
+                    props.match.params.empId,
+                    updateEmployeeMutate,
+                    createAddressMutate,
+                    createSkillMutate,
+                    state.delSkillIds,
+                    state.delAddressIds
+                  )
+                }
+              >
+                Save
+              </Button>
+            )}
           </CardActions>
         </Card>
       </div>
