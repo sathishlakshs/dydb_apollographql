@@ -18,6 +18,8 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import TableViewWithAction from "./tableView";
+import {addressValidationFields} from '../validationFieldTypes';
+import {isValid} from '../commonMethods';
 import * as _ from "lodash";
 
 const useStyles = makeStyles(theme => ({
@@ -65,15 +67,21 @@ const handleStateChange = (value, setState, state) => {
 };
 
 const add = (setState, state, addresss, ancestorSetState) => {
-  state.form["cityName"] = cities.find(c => c.id === state.form.city).name;
-  state.form["stateName"] = states.find(s => s.id === state.form.state).name;
-  if (state.editIndex < 0) {
-    addresss.push({ ...state.form });
-  } else {
-    addresss[state.editIndex] = {...state.form};
+  if (_.isEmpty(isValid(state.form, addressValidationFields))) {
+    state.form["cityName"] = cities.find(c => c.id === state.form.city).name;
+    state.form["stateName"] = states.find(s => s.id === state.form.state).name;
+    if (state.editIndex < 0) {
+      addresss.push({ ...state.form });
+    } else {
+      addresss[state.editIndex] = { ...state.form };
+    }
+    ancestorSetState(addresss);
+    setState({
+      cities: [],
+      editIndex: -1,
+      form: { line1: "", line2: "", zipcode: "", city: "", state: "" }
+    });
   }
-  ancestorSetState(addresss);
-  setState({cities:[], editIndex: -1, form: { line1: "", line2: "", zipcode: "", city: "", state: "" }});
 };
 
 const locationNameCon = data => {
@@ -102,11 +110,11 @@ function AddresssForm(props) {
   };
 
   const del = (id, deleteMut, index) => {
-    if(id) {
+    if (id) {
       collectDelId(id);
     }
     addresss.splice(index, 1);
-   };
+  };
 
   return (
     <>
@@ -158,7 +166,9 @@ function AddresssForm(props) {
                     }
                   >
                     {states.map(s => (
-                      <MenuItem value={s.id} key={s.id}>{s.name}</MenuItem>
+                      <MenuItem value={s.id} key={s.id}>
+                        {s.name}
+                      </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
@@ -183,7 +193,9 @@ function AddresssForm(props) {
                     }
                   >
                     {state.cities.map(c => (
-                      <MenuItem value={c.id} key={c.id}>{c.name}</MenuItem>
+                      <MenuItem value={c.id} key={c.id}>
+                        {c.name}
+                      </MenuItem>
                     ))}
                   </Select>
                 </FormControl>

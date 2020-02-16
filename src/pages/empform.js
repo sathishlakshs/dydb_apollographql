@@ -24,7 +24,8 @@ import {
 import Header from "../common/header";
 import MultiSelectTextField from "../common/multiSelectText";
 import Grid from "@material-ui/core/Grid";
-import { employeesPartitioning } from "../commonMethods";
+import { employeesPartitioning, isValid } from "../commonMethods";
+import {empValidationFields} from '../validationFieldTypes';
 
 const fakeData = {
   firstName: "sathish",
@@ -82,7 +83,12 @@ const createAddresss = async (addresss, createAddressMutate) => {
 const createSkills = async (skills, createSkillMutate) => {
   for (const s of skills) {
     const data = await createSkillMutate({
-      variables: { name: s.name, empId: s.empId }
+      variables: { name: s.name, empId: s.empId },
+      refetchQueries: [
+        {
+          query: GET_EMPLOYEES
+        }
+      ]
     });
   }
 };
@@ -114,7 +120,7 @@ const save = async (
   delSkillIds,
   delAddressIds
 ) => {
-  if (form.firstName && form.lastName) {
+  if (_.isEmpty(isValid(form, empValidationFields))) {
     await createEmp(form.firstName, form.lastName, createEmployeeMutate);
     history.push("/home");
   }
@@ -200,78 +206,80 @@ function Empform(props) {
   };
 
   const Update = async () => {
-    if (props.match.params.empId && props.match.params.empId !== "0") {
-      if (!_.isEmpty(state.delSkillIds)) {
-        for (const s of state.delSkillIds) {
-          const data = await deleteSkillMutate({
-            variables: { id: s }
-          });
-        }
-      }
-      if (!_.isEmpty(state.delAddressIds)) {
-        for (const a of state.delAddressIds) {
-          const data = await deleteAddressMutate({
-            variables: { id: a }
-          });
-        }
-      }
-      for (const a of state.form.addresss) {
-        if (a.id) {
-          await updateAddressMutate({
-            variables: {
-              id: a.id,
-              line1: a.line1,
-              line2: a.line2,
-              state: a.state,
-              city: a.city,
-              zipcode: a.zipcode,
-              empId: a.empId
-            }
-          });
-        } else {
-         await createAddressMutate({
-            variables: {
-              line1: a.line1,
-              line2: a.line2,
-              city: a.city,
-              state: a.state,
-              zipcode: a.zipcode,
-              empId: props.match.params.empId
-            }
-          });
-        }
-      }
-      for (const s of state.form.skills) {
-        if (s.id) {
-          await updateSkillMutate({
-            variables: {
-              id: s.id,
-              name: s.name,
-              empId: s.empId
-            }
-          });
-        } else {
-         await createSkillMutate({
-            variables: {
-              name: s.name,
-              empId: props.match.params.empId
-            }
-          });
-        }
-      }
-      await updateEmployeeMutate({
-        variables: {
-          id: props.match.params.empId,
-          firstName: state.form.firstName,
-          lastName: state.form.lastName
-        },
-        refetchQueries: [
-          {
-            query: GET_EMPLOYEES
+    if (_.isEmpty(isValid(state.form, empValidationFields))) {
+      if (props.match.params.empId && props.match.params.empId !== "0") {
+        if (!_.isEmpty(state.delSkillIds)) {
+          for (const s of state.delSkillIds) {
+            const data = await deleteSkillMutate({
+              variables: { id: s }
+            });
           }
-        ]
-      });
-      history.push("/home");
+        }
+        if (!_.isEmpty(state.delAddressIds)) {
+          for (const a of state.delAddressIds) {
+            const data = await deleteAddressMutate({
+              variables: { id: a }
+            });
+          }
+        }
+        for (const a of state.form.addresss) {
+          if (a.id) {
+            await updateAddressMutate({
+              variables: {
+                id: a.id,
+                line1: a.line1,
+                line2: a.line2,
+                state: a.state,
+                city: a.city,
+                zipcode: a.zipcode,
+                empId: a.empId
+              }
+            });
+          } else {
+            await createAddressMutate({
+              variables: {
+                line1: a.line1,
+                line2: a.line2,
+                city: a.city,
+                state: a.state,
+                zipcode: a.zipcode,
+                empId: props.match.params.empId
+              }
+            });
+          }
+        }
+        for (const s of state.form.skills) {
+          if (s.id) {
+            await updateSkillMutate({
+              variables: {
+                id: s.id,
+                name: s.name,
+                empId: s.empId
+              }
+            });
+          } else {
+            await createSkillMutate({
+              variables: {
+                name: s.name,
+                empId: props.match.params.empId
+              }
+            });
+          }
+        }
+        await updateEmployeeMutate({
+          variables: {
+            id: props.match.params.empId,
+            firstName: state.form.firstName,
+            lastName: state.form.lastName
+          },
+          refetchQueries: [
+            {
+              query: GET_EMPLOYEES
+            }
+          ]
+        });
+        history.push("/home");
+      }
     }
   };
 

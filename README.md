@@ -1,4 +1,10 @@
 # dydb_apollographql
+
+// run
+cmd git clone https://github.com/sathishlakshs/dydb_apollographql.git
+cmd: npm install 
+cmd: npm start
+
 /**************************** server ***************************************/
 
 cmd: npm install -g @aws-amplify/cli

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../common/header";
 import TableViewWithAction from "../common/tableView";
 import { useQuery, useMutation } from "@apollo/react-hooks";
@@ -9,7 +9,7 @@ import { useHistory } from "react-router-dom";
 import { GET_EMPLOYEES, listSkills } from "../graphql/queries";
 import {DELETE_ADDRESS, DELETE_SKILL, DELETE_EMPLOYEE} from '../graphql/mutations';
 import { employeesPartitioning } from "../commonMethods";
-
+import ConformationModal from '../common/conformationModal';
 
 // export const GET_EMPLOYEES = gql`
 //   query {
@@ -46,6 +46,7 @@ const navEmpForm = () => {
 
 function Home() {
   const history = useHistory();
+  const [state, setState] = useState({isOpen: false, empId:'', index: -1, deleteData:{} });
   const { data, loading, error } = useQuery(GET_EMPLOYEES);
   let modifyData = [];
   if (data) {
@@ -78,20 +79,37 @@ function Home() {
     }
   };
 
-  const deleteEmp = async(empId, deleteEmployeeMutate, index, deleteData) => {
-    const skillIds = deleteData.skills.map(s => s.id);
-    const addressIds = deleteData.addresss.map(a => a.id);
+  const deleteEmp = async() => {
+    const skillIds = state.deleteData.skills.map(s => s.id);
+    const addressIds = state.deleteData.addresss.map(a => a.id);
     await deleteAddresss(addressIds);
     await deleteSkills(skillIds);
     await deleteEmployeeMutate({
-      variables: { id: empId },
+      variables: { id: state.empId },
       refetchQueries: [
         {
           query: GET_EMPLOYEES
         }
       ]
     });
+    setState({isOpen: false, empId:'', index: -1, deleteData:{} });
   };
+
+  const confirmationAgree = () => {
+    deleteEmp();
+  }
+
+const openModal = (empId, deleteEmployeeMutate, index, deleteData) => {
+  state.isOpen = true;
+  state.deleteData = deleteData;
+  state.index = index;
+  state.empId = empId;
+  setState({...state});
+}
+
+  const closeModal = () => {
+    setState({isOpen: false, empId:'', index: -1, deleteData:{} });
+  }
 
   return (
     <>
@@ -104,12 +122,13 @@ function Home() {
             deleteMutate={deleteEmployeeMutate}
             edit={editEmp}
             isAction={true}
-            del={deleteEmp}
+            del={openModal}
           />
         ) : (
           "Data not found"
         )}
       </div>
+      <ConformationModal  title={"Conformation"} message={"Do you want delete this employee ?"} isOpen={state.isOpen} confirm={confirmationAgree} cancel={closeModal}/>
     </>
   );
 }
