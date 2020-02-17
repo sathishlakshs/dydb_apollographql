@@ -144,7 +144,7 @@ function Home(props) {
       {loading && <Spinner />}
       {/* <Header addNew={navEmpForm()} label={"EmployeeList"} /> */}
       <div className="pl30 pr30 pt30">
-        {!loading ? (
+        {!_.isEmpty(modifyData) ? (
           <TableViewWithAction
             bodyData={tableBody(modifyData)}
             heading={tableHeader()}
