@@ -25,6 +25,8 @@ import { useQuery } from "react-apollo";
 import { GET_EMPLOYEES } from "../graphql/queries";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import FaceIcon from "@material-ui/icons/Face";
+import SearchField from "../common/searchField";
+import NotFound from './pageNotFound';
 
 const drawerWidth = 240;
 
@@ -92,7 +94,11 @@ export default function Layout(props) {
   if (data) {
     sideMenus = data.listEmployees.items;
   }
-  const [state, setState] = React.useState({ isDrawer: false });
+  const [state, setState] = React.useState({
+    isDrawer: false,
+    searchValue: "",
+    isSearchReq: false
+  });
 
   const handleDrawerOpen = () => {
     setState({ ...state, isDrawer: true });
@@ -100,6 +106,14 @@ export default function Layout(props) {
 
   const handleDrawerClose = () => {
     setState({ ...state, isDrawer: false });
+  };
+
+  const searchHandler = value => {
+    setState({ ...state, searchValue: value });
+  };
+
+  const searchReq = bool => {
+    setState({ ...state, isSearchReq: bool });
   };
 
   return (
@@ -113,23 +127,30 @@ export default function Layout(props) {
               [classes.appBarShift]: state.isDrawer
             })}
           >
-            <Toolbar>
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleDrawerOpen}
-                edge="start"
-                className={clsx(
-                  classes.menuButton,
-                  state.isDrawer && classes.hide
-                )}
-              >
-                <MenuIcon />
-              </IconButton>
-              <Typography variant="h6" noWrap>
-                Employee
-              </Typography>
-            </Toolbar>
+            <div className="relative">
+              <Toolbar>
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  onClick={handleDrawerOpen}
+                  edge="start"
+                  className={clsx(
+                    classes.menuButton,
+                    state.isDrawer && classes.hide
+                  )}
+                >
+                  <MenuIcon />
+                </IconButton>
+                <Typography variant="h6" noWrap>
+                  Employee
+                </Typography>
+              </Toolbar>
+              { state.isSearchReq &&
+                <div className="searchField">
+                  <SearchField searchHandler={searchHandler} searchValue= {state.searchValue}/>
+                </div>
+              }
+            </div>
           </AppBar>
           <Drawer
             className={classes.drawer}
@@ -152,10 +173,7 @@ export default function Layout(props) {
             <List>
               {sideMenus.map((emp, index) => (
                 <Link to={`/employee/${emp.id}`}>
-                  <ListItem
-                    button
-                    key={emp.firstName + emp.lastName}
-                  >
+                  <ListItem button key={emp.firstName + emp.lastName}>
                     <ListItemIcon>
                       {index % 2 === 0 ? <AccountCircleIcon /> : <FaceIcon />}
                     </ListItemIcon>
@@ -175,14 +193,14 @@ export default function Layout(props) {
             <div className={classes.drawerHeader} />
             <Route
               path="/form/:empId"
-              render={props => <Empform {...props} />}
+              render={props => <Empform {...props} searchReq={searchReq} />}
             ></Route>
             <Route
               path="/employee/:empId"
-              render={props => <Empdetails {...props} />}
+              render={props => <Empdetails {...props} searchReq={searchReq} />}
             ></Route>
-            <Route path="/list">
-              <Home client={props.client} />
+            <Route exact  path="/">
+              <Home client={props.client} searchReq={searchReq} searchValue={state.searchValue}/>
             </Route>
           </main>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../common/header";
 import TableViewWithAction from "../common/tableView";
 import { useQuery, useMutation } from "@apollo/react-hooks";
@@ -15,9 +15,8 @@ import {
 import { employeesPartitioning } from "../commonMethods";
 import ConformationModal from "../common/conformationModal";
 import Spinner from "../common/spinner";
-import Icon from '@material-ui/core/Icon';
-import AddIcon from '@material-ui/icons/Add';
-
+import Icon from "@material-ui/core/Icon";
+import AddIcon from "@material-ui/icons/Add";
 
 // export const GET_EMPLOYEES = gql`
 //   query {
@@ -48,13 +47,15 @@ const navEmpForm = history => {
   history.push("/form/0");
 };
 
-function Home() {
+function Home(props) {
+  const { searchReq, searchValue } = props;
   const history = useHistory();
   const [state, setState] = useState({
     isOpen: false,
     empId: "",
     index: -1,
-    deleteData: {}
+    deleteData: {},
+    previousSearchValue: ""
   });
   const { data, loading, error } = useQuery(GET_EMPLOYEES);
   let modifyData = [];
@@ -68,6 +69,17 @@ function Home() {
   const [deleteEmployeeMutate] = useMutation(DELETE_EMPLOYEE);
   const [deleteAddressMutate] = useMutation(DELETE_ADDRESS);
   const [deleteSkillMutate] = useMutation(DELETE_SKILL);
+
+  // if (state.previousSearchValue !== searchValue) {
+  //   console.log(state.previousSearchValue, searchValue);
+  //   setState({...state, previousSearchValue: searchValue});
+  //   const res = useQuery(GET_EMPLOYEES)
+  // }
+
+  useEffect(() => {
+    searchReq(false);
+  }, []);
+
   const editEmp = empId => {
     history.push(`/form/${empId}`);
   };
@@ -137,14 +149,20 @@ function Home() {
             edit={editEmp}
             isAction={true}
             del={openModal}
-            routerLink = { specifyEmpDetails }
+            routerLink={specifyEmpDetails}
           />
         ) : (
           "Data not found"
         )}
       </div>
-      <div className="addIconBtn" title={"Add new"} onClick={() => navEmpForm(history)}>
-        <div className="roundIcon"><AddIcon style={{color: 'white'}} /></div>
+      <div
+        className="addIconBtn"
+        title={"Add new"}
+        onClick={() => navEmpForm(history)}
+      >
+        <div className="roundIcon">
+          <AddIcon style={{ color: "white" }} />
+        </div>
       </div>
       <ConformationModal
         title={"Conformation"}

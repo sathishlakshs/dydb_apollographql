@@ -122,6 +122,7 @@ const handleChange = (name, value, setStateData, state) => {
 };
 
 function Empform(props) {
+  const {searchReq} = props;
   const history = useHistory();
   const [state, setStateData] = useState({
     skill: "",
@@ -180,6 +181,7 @@ function Empform(props) {
         });
       }
     }
+    searchReq(false);
   }, [data]);
 
   const addresssStateChange = addresss => {
@@ -275,8 +277,10 @@ function Empform(props) {
   };
   
   const navEmpList = () => {
-      history.push('/list');
+      history.push('/');
   }
+
+  // searchReq(false);
 
   return (
     <>

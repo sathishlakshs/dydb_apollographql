@@ -99,9 +99,9 @@
 
 .addIconBtn {
   position: fixed;
-    right: 30px;
-    bottom: 25px;
-    float: right;
+  right: 30px;
+  bottom: 25px;
+  float: right;
 }
 
 .roundIcon {
@@ -167,4 +167,22 @@
 }
 .col-12 {
   width: 100%;
+}
+
+.middle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  float: right;
+}
+
+.flexEnd {
+  display: inline-flex;
+  justify-content: flex-end;
+}
+
+.searchField{
+  position: absolute;
+    right: 30px;
+    top: 8px;
 }

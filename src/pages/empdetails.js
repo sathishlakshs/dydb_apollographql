@@ -43,16 +43,20 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function Empdetails(props) {
+  const {searchReq} = props;
   const history = useHistory();
   const { data, loading } = useQuery(GET_EMPLOYEE_BY_ID, {
     variables: { id: props.match.params.empId, empId: props.match.params.empId }
   });
-  console.log(data);
-
+  // searchReq(false);
   const classes = useStyles();
   const navEmpList = () => {
-      history.push('/list');
+      history.push('/');
   }
+
+  useEffect(()=>{
+    searchReq(false);
+  }, []);
 
   return (
     <>
