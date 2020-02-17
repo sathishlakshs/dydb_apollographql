@@ -181,8 +181,13 @@
   justify-content: flex-end;
 }
 
-.searchField{
+.searchField {
   position: absolute;
-    right: 30px;
-    top: 8px;
+  right: 30px;
+  top: 8px;
+}
+.dataNotFound {
+  font-size: 2rem;
+  font-style: oblique;
+  font-weight: 500;
 }

@@ -155,7 +155,7 @@ function Home(props) {
             routerLink={specifyEmpDetails}
           />
         ) : (
-          "Data not found"
+          <div className="dataNotFound">Data not found</div>
         )}
       </div>
       <div
