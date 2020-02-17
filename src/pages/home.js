@@ -12,7 +12,7 @@ import {
   DELETE_SKILL,
   DELETE_EMPLOYEE
 } from "../graphql/mutations";
-import { employeesPartitioning } from "../commonMethods";
+import { employeesPartitioning, getFilterData } from "../commonMethods";
 import ConformationModal from "../common/conformationModal";
 import Spinner from "../common/spinner";
 import Icon from "@material-ui/core/Icon";
@@ -65,6 +65,9 @@ function Home(props) {
       [...data.listAddresss.items],
       [...data.listSkills.items]
     );
+    if (searchValue !== "") {
+      modifyData = getFilterData(searchValue, [...modifyData]);
+    }
   }
   const [deleteEmployeeMutate] = useMutation(DELETE_EMPLOYEE);
   const [deleteAddressMutate] = useMutation(DELETE_ADDRESS);
@@ -77,7 +80,7 @@ function Home(props) {
   // }
 
   useEffect(() => {
-    searchReq(false);
+    searchReq(true);
   }, []);
 
   const editEmp = empId => {

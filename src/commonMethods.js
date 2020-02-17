@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from "lodash";
 
 export const employeesPartitioning = (emps, adds, skills) => {
   for (const [i, e] of emps.entries()) {
@@ -36,16 +36,34 @@ export const dataTrim = (label, len) => {
 
 export const isValid = (data, fieldTypes) => {
   const error = new Object(null);
-for (const ft of fieldTypes) {
-  if (ft.type === 'STRING' ) {
-    if(!data[ft.key] || data[ft.key] === '0') {
+  for (const ft of fieldTypes) {
+    if (ft.type === "STRING") {
+      if (!data[ft.key] || data[ft.key] === "0") {
         error[ft.key] = ft.key + " should not be empty";
-    }
-  } else if (ft.type === 'OBJECT') {
-    if(_.isEmpty(data[ft.key])) {
-        error[ft.key] = "Minimum one "+ ft.key + " required";
+      }
+    } else if (ft.type === "OBJECT") {
+      if (_.isEmpty(data[ft.key])) {
+        error[ft.key] = "Minimum one " + ft.key + " required";
+      }
     }
   }
-}
   return error;
+};
+
+export const getFilterData = (searchValue, data) => {
+  const temp = [];
+  for (const [index, d] of data.entries()) {
+    let isSplice = false;
+    if (
+      d.firstName.toLowerCase().includes(searchValue.toLowerCase()) ||
+      d.lastName.toLowerCase().includes(searchValue.toLowerCase()) ||
+      d.skills.findIndex(s => (s.name.toLowerCase()).includes(searchValue.toLowerCase())) > -1
+    ) {
+      isSplice = true;
+    }
+    if (isSplice) {
+      temp.push(d);
+    }
+  }
+  return temp;
 };
