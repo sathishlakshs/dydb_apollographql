@@ -2,6 +2,18 @@ import gql from "graphql-tag";
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const GET_EMPLOYEE_NAMES = gql`
+  query {
+    listEmployees {
+      items {
+        id
+        firstName
+        lastName
+      }
+    }
+  }
+`;
+
 export const GET_EMPLOYEE_BY_ID = gql`
   query empById($id: ID!, $empId: String) {
     getEmployee(id: $id) {
@@ -9,9 +21,7 @@ export const GET_EMPLOYEE_BY_ID = gql`
       firstName
       lastName
     }
-    listAddresss(filter: {
-      empId:{contains: $empId}
-    }) {
+    listAddresss(filter: { empId: { contains: $empId } }) {
       items {
         id
         line1
@@ -22,9 +32,7 @@ export const GET_EMPLOYEE_BY_ID = gql`
         empId
       }
     }
-    listSkills(filter: {
-      empId:{contains: $empId}
-    }) {
+    listSkills(filter: { empId: { contains: $empId } }) {
       items {
         id
         name

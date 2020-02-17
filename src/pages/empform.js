@@ -11,6 +11,9 @@ import { useHistory } from "react-router-dom";
 import { GET_EMPLOYEES, GET_EMPLOYEE_BY_ID } from "../graphql/queries";
 import _ from "lodash";
 import AddresssForm from "../common/addressForm";
+import Spinner from "../common/spinner";
+import DraggableModal from "../common/draggableModal";
+import ViewListIcon from '@material-ui/icons/ViewList';
 import {
   CREATE_EMPLOYEE,
   CREATE_ADDRESS,
@@ -25,22 +28,7 @@ import Header from "../common/header";
 import MultiSelectTextField from "../common/multiSelectText";
 import Grid from "@material-ui/core/Grid";
 import { employeesPartitioning, isValid } from "../commonMethods";
-import {empValidationFields} from '../validationFieldTypes';
-
-const fakeData = {
-  firstName: "sathish",
-  lastName: "kumar",
-  addresss: [
-    {
-      line1: "9th cross",
-      line2: "nethaji street",
-      zipcode: "600042",
-      city: "1",
-      state: "1"
-    }
-  ],
-  skills: [{ name: "reactjs" }]
-};
+import { empValidationFields } from "../validationFieldTypes";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -111,18 +99,17 @@ const createAddressAndSkill = (
   }
 };
 
-const save = async (
-  form,
-  createEmployeeMutate,
-  history,
-  empId,
-  updateEmployeeMutate,
-  delSkillIds,
-  delAddressIds
-) => {
-  if (_.isEmpty(isValid(form, empValidationFields))) {
-    await createEmp(form.firstName, form.lastName, createEmployeeMutate);
+const save = async (state, createEmployeeMutate, history, setStateData) => {
+  if (_.isEmpty(isValid(state.form, empValidationFields))) {
+    await createEmp(
+      state.form.firstName,
+      state.form.lastName,
+      createEmployeeMutate
+    );
     history.push("/home");
+  } else {
+    const errors = isValid(state.form, empValidationFields);
+    setStateData({ ...state, errors, isErrorModal: true });
   }
 };
 
@@ -138,6 +125,8 @@ function Empform(props) {
   const history = useHistory();
   const [state, setStateData] = useState({
     skill: "",
+    isErrorModal: false,
+    errors: {},
     delAddressIds: [],
     delSkillIds: [],
     form: {
@@ -147,21 +136,18 @@ function Empform(props) {
       skills: []
     }
   });
-  const { data } = useQuery(GET_EMPLOYEE_BY_ID, {
+  const { data, loading } = useQuery(GET_EMPLOYEE_BY_ID, {
     variables: { id: props.match.params.empId, empId: props.match.params.empId }
   });
-  const [createEmployeeMutate, { loading, error }] = useMutation(
-    CREATE_EMPLOYEE,
-    {
-      onCompleted: data =>
-        createAddressAndSkill(
-          data,
-          createAddressMutate,
-          createSkillMutate,
-          state.form
-        )
-    }
-  );
+  const [createEmployeeMutate, { error }] = useMutation(CREATE_EMPLOYEE, {
+    onCompleted: data =>
+      createAddressAndSkill(
+        data,
+        createAddressMutate,
+        createSkillMutate,
+        state.form
+      )
+  });
   const [createAddressMutate] = useMutation(CREATE_ADDRESS);
   const [createSkillMutate] = useMutation(CREATE_SKILL);
   const [updateEmployeeMutate] = useMutation(UPDATE_EMPLOYEE);
@@ -224,6 +210,7 @@ function Empform(props) {
         }
         for (const a of state.form.addresss) {
           if (a.id) {
+            console.log(a);
             await updateAddressMutate({
               variables: {
                 id: a.id,
@@ -232,7 +219,7 @@ function Empform(props) {
                 state: a.state,
                 city: a.city,
                 zipcode: a.zipcode,
-                empId: a.empId
+                empId: props.match.params.empId
               }
             });
           } else {
@@ -254,7 +241,7 @@ function Empform(props) {
               variables: {
                 id: s.id,
                 name: s.name,
-                empId: s.empId
+                empId: props.match.params.empId
               }
             });
           } else {
@@ -283,11 +270,18 @@ function Empform(props) {
     }
   };
 
-  console.log(state);
+  const errorModalClose = () => {
+    setStateData({ ...state, errors: {}, isErrorModal: false });
+  };
+  
+  const navEmpList = () => {
+      history.push('/list');
+  }
 
   return (
     <>
-      <Header label={"Employee Form"} />
+      {loading && <Spinner />}
+      {/* <Header label={"Employee Form"} /> */}
       <div className="ml9rem mr9rem mt40">
         <Card className={classes.root}>
           <CardContent>
@@ -308,6 +302,7 @@ function Empform(props) {
                         )
                       }
                       value={state.form.firstName}
+                      variant="filled"
                     />
                   </Grid>
                   <Grid item xs={4}>
@@ -324,6 +319,7 @@ function Empform(props) {
                         )
                       }
                       value={state.form.lastName}
+                      variant="filled"
                     />
                   </Grid>
                   <Grid item xs={4}>
@@ -359,17 +355,7 @@ function Empform(props) {
                 variant="contained"
                 color="primary"
                 onClick={() =>
-                  save(
-                    state.form,
-                    createEmployeeMutate,
-                    history,
-                    props.match.params.empId,
-                    updateEmployeeMutate,
-                    createAddressMutate,
-                    createSkillMutate,
-                    state.delSkillIds,
-                    state.delAddressIds
-                  )
+                  save(state, createEmployeeMutate, history, setStateData)
                 }
               >
                 Save
@@ -377,6 +363,14 @@ function Empform(props) {
             )}
           </CardActions>
         </Card>
+      </div>
+      <DraggableModal
+        isOpen={state.isErrorModal}
+        errors={state.errors}
+        close={errorModalClose}
+      />
+      <div className="addIconBtn" title={"Add new"} onClick={() => navEmpList(history)}>
+        <div className="roundIcon"><ViewListIcon style={{color: 'white'}} /></div>
       </div>
     </>
   );

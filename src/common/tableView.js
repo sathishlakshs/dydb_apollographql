@@ -14,11 +14,12 @@ import Box from "@material-ui/core/Box";
 
 const StyledTableCell = withStyles(theme => ({
   head: {
-    backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white
+    backgroundColor: "#b1b6ba",
+    color: theme.palette.common.white,
   },
   body: {
-    fontSize: 14
+    fontSize: 14,
+    cursor: "pointer"
   }
 }))(TableCell);
 
@@ -56,7 +57,12 @@ const useStyles = makeStyles(theme => ({
 
 export default function TableViewWithAction(props) {
   const classes = useStyles();
-  const { isAction, heading, bodyData, edit, del, deleteMutate } = props;
+  const { isAction, heading, bodyData, edit, del, deleteMutate, routerLink } = props;
+  const cellClick = (empId) => {
+    if(routerLink) {
+      routerLink(empId);
+    }
+  }
   // console.log(rows(bodyData, heading));
   // console.log(bodyData);
   return (
@@ -78,7 +84,7 @@ export default function TableViewWithAction(props) {
           {bodyData.map((bData, index) => (
             <StyledTableRow key={index}>
               {props.heading.map((h, index) => (
-                <StyledTableCell component="th" scope="row" key={index}>
+                <StyledTableCell component="th" scope="row" key={index} onClick={() => cellClick(bData.id)}>
                   {bData[h.key]}
                 </StyledTableCell>
               ))}

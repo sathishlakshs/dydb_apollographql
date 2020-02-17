@@ -37,9 +37,20 @@
   }
 }
 
+.leftLabel {
+  font-size: 1rem;
+  font-style: oblique;
+  font-family: cursive;
+  font-weight: bold;
+}
+
 .linkBtn {
   text-decoration: none;
-  color: white
+  color: white;
+}
+
+.pl10 {
+  padding-left: 10px;
 }
 
 .pl30 {
@@ -52,6 +63,10 @@
 
 .pt30 {
   padding-top: 30px;
+}
+
+.mb20 {
+  margin-bottom: 20px;
 }
 
 .mt30 {
@@ -82,14 +97,39 @@
   float: right;
 }
 
+.addIconBtn {
+  position: fixed;
+    right: 30px;
+    bottom: 25px;
+    float: right;
+}
+
+.roundIcon {
+  cursor: pointer;
+  border-radius: 50%;
+  height: 40px;
+  width: 40px;
+  background-color: #3f51b5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .bgBlueAsh {
   background-color: #f1f2f3;
 }
 .row {
-    display: flex;
-    flex-wrap: wrap;
-    margin-right: 0px !important;
-    margin-left: 0px !important;
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: 0px !important;
+  margin-left: 0px !important;
 }
 
 .col-1 {

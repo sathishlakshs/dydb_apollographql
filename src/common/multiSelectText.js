@@ -35,6 +35,7 @@ function MultiSelectTextField(props) {
             keyPress(fieldKey, e, ancestorStateChange, state, setValue)
           }
           value={value}
+          variant="filled"
         />
         <div>
           {chips.map((c, index) => (

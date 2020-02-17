@@ -18,8 +18,8 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import TableViewWithAction from "./tableView";
-import {addressValidationFields} from '../validationFieldTypes';
-import {isValid} from '../commonMethods';
+import { addressValidationFields } from "../validationFieldTypes";
+import { isValid } from "../commonMethods";
 import * as _ from "lodash";
 
 const useStyles = makeStyles(theme => ({
@@ -116,6 +116,17 @@ function AddresssForm(props) {
     addresss.splice(index, 1);
   };
 
+  const zipcodeHandler = (value) => {
+    if(!isNaN(value)) {
+      if(value.length < 7) {
+        setData({
+          ...state,
+          form: { ...state.form, zipcode: value }
+        });
+      }
+    }
+  };
+
   return (
     <>
       <Card className={classes.root}>
@@ -135,6 +146,7 @@ function AddresssForm(props) {
                     })
                   }
                   value={state.form.line1}
+                  variant="filled"
                 />
               </Grid>
               <Grid item xs={4}>
@@ -149,69 +161,61 @@ function AddresssForm(props) {
                     })
                   }
                   value={state.form.line2}
+                  variant="filled"
                 />
               </Grid>
               <Grid item xs={4}>
-                <FormControl
-                  className={classes.formControl}
-                  style={{ width: "93%" }}
+                <TextField
+                  id="filled-select-currency-native"
+                  select
+                  label="State"
+                  value={state.form.state}
+                  onChange={e =>
+                    handleStateChange(e.target.value, setData, state)
+                  }
+                  helperText=""
+                  variant="filled"
                 >
-                  <InputLabel id="demo-simple-select-label">State</InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={state.form.state}
-                    onChange={e =>
-                      handleStateChange(e.target.value, setData, state)
-                    }
-                  >
-                    {states.map(s => (
-                      <MenuItem value={s.id} key={s.id}>
-                        {s.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                  {states.map(s => (
+                    <option value={s.id} key={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </TextField>
               </Grid>
             </Grid>
             <Grid container spacing={2}>
               <Grid item xs={6}>
-                <FormControl
-                  className={classes.formControl}
-                  style={{ width: "100%" }}
+                <TextField
+                  id="filled-select-currency-native"
+                  select
+                  label="City"
+                  value={state.form.city}
+                  onChange={e =>
+                    setData({
+                      ...state,
+                      form: { ...state.form, city: e.target.value }
+                    })
+                  }
+                  helperText=""
+                  variant="filled"
                 >
-                  <InputLabel id="demo-simple-select-label">City</InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={state.form.city}
-                    onChange={e =>
-                      setData({
-                        ...state,
-                        form: { ...state.form, city: e.target.value }
-                      })
-                    }
-                  >
-                    {state.cities.map(c => (
-                      <MenuItem value={c.id} key={c.id}>
-                        {c.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                  {state.cities.map(c => (
+                    <option value={c.id} key={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </TextField>
               </Grid>
               <Grid item xs={6}>
                 <TextField
                   required
                   label="Zipcode"
-                  style={{ width: "95%" }}
+                  style={{ width: "100%" }}
                   value={state.form.zipcode}
-                  onChange={e =>
-                    setData({
-                      ...state,
-                      form: { ...state.form, zipcode: e.target.value }
-                    })
-                  }
+                  onChange={e => zipcodeHandler(e.target.value)}
+                  variant="filled"
+                  helperText="Its number field and don't exsist six digit"
                 />
               </Grid>
             </Grid>
