@@ -39,14 +39,14 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const cities = [
+export const cities = [
   { id: "1", name: "Chennai", stateId: "1" },
   { id: "2", name: "Trichy", stateId: "1" },
   { id: "3", name: "Karaikudi", stateId: "1" },
   { id: "4", name: "Visagapattinam", stateId: "2" },
   { id: "5", name: "Vijayavada", stateId: "2" }
 ];
-const states = [
+export const states = [
   { id: "1", name: "TamilNadu" },
   { id: "2", name: "Andra Pradesh" }
 ];

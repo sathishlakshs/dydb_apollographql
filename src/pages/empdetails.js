@@ -10,6 +10,7 @@ import { GET_EMPLOYEES, GET_EMPLOYEE_BY_ID } from "../graphql/queries";
 import _ from "lodash";
 import Spinner from "../common/spinner";
 import ViewListIcon from '@material-ui/icons/ViewList';
+import {cities, states} from '../common/addressForm';
 
 const fakeData = {
   firstName: "sathish",
@@ -48,6 +49,7 @@ function Empdetails(props) {
   const { data, loading } = useQuery(GET_EMPLOYEE_BY_ID, {
     variables: { id: props.match.params.empId, empId: props.match.params.empId }
   });
+  
   // searchReq(false);
   const classes = useStyles();
   const navEmpList = () => {
@@ -111,12 +113,12 @@ function Empdetails(props) {
                         <tr>
                           <td className="leftLabel">City</td>
                           <td>:</td>
-                          <td>{a.city}</td>
+                          <td>{cities.find(c=> c.id === a.city).name}</td>
                         </tr>
                         <tr>
                           <td className="leftLabel">State</td>
                           <td>:</td>
-                          <td>{a.state}</td>
+                          <td>{states.find(s=>s.id === a.state).name}</td>
                         </tr>
                         <tr>
                           <td className="leftLabel">Zipcode</td>
